@@ -1,8 +1,3 @@
-console.log("Hello, world!");
-
-let humanScore = 0;
-let computerScore = 0;
-
 let getComputerChoice = () => {
     /*
         get a random number from 0 to 2
@@ -44,66 +39,86 @@ let getHumanChoice = () => {
 let playRound = (humanChoice, computerChoice) => {
         /*
             compare the two parameters according to the rps rules
-            if the human wins, increment the human score
-            if the computer wins, increment the computer score
+            if the human wins, return 1
+            if the computer wins, return -1
+            if it's a draw, return 0
         */
-    let humanWin = true;
-    let draw = false;
+    let humanWin = 1;
+    let draw = humanChoice == computerChoice;
 
-    switch(humanChoice) {
-        case "rock":
-            if (computerChoice === "paper") {
-                humanWin = false;
-                computerScore++;
-            } else if (computerChoice === "scissors") {
-                humanScore++;
-            } else {
-                draw = true;
-            }
-            break;
-        case "paper":
-            if (computerChoice === "scissors") {
-                humanWin = false;
-                computerScore++;
-            } else if (computerChoice === "rock") {
-                humanScore++;
-            } else {
-                draw = true;
-            }
-            break;
-        case "scissors":
-            if (computerChoice === "rock") {
-                humanWin = false;
-                computerScore++;
-            } else if (computerChoice === "paper") {
-                humanScore++;
-            } else {
-                draw = true;
-            }
-            break;
-        default:
-            humanWin = false;
-            break;
-    }
-
-    let winnerPhrase = "";
-    const capitalizedHumanChoice = humanChoice[0].toUpperCase() + humanChoice.slice(1);
-    const capitalizedComputerChoice = computerChoice[0].toUpperCase() + computerChoice.slice(1);
     if(!draw) {
-        if(humanWin) {
-            winnerPhrase = `You win! ${capitalizedHumanChoice} beats ${capitalizedComputerChoice}`;          
-        } else {
-            winnerPhrase = `You lose! ${capitalizedComputerChoice} beats ${capitalizedHumanChoice}`;  
+        switch(humanChoice) {
+            case "rock":
+                if (computerChoice === "paper") {
+                    humanWin = -1;
+                }
+                break;
+            case "paper":
+                if (computerChoice === "scissors") {
+                    humanWin = -1;
+                }
+                break;
+            case "scissors":
+                if (computerChoice === "rock") {
+                    humanWin = -1;
+                }
+                break;
+            default:
+                humanWin = -1;
+                break;
         }
-        console.log(winnerPhrase);
     } else {
-        console.log("It's a draw !")
+        humanWin = 0;
     }
-    console.log("Human: " + humanScore)
-    console.log("Computer: " + computerScore)
+    
+    return humanWin;
 }
 
-const humanChoice = getHumanChoice();
-const computerChoice = getComputerChoice();
+let playGame = () => {
+    /*
+        loops 5 times to play 5 rounds
+    */
+    let humanScore = 0;
+    let computerScore = 0;
 
-playRound(humanChoice, computerChoice);
+    for(let i = 0; i < 5; i++) {
+        const humanChoice = getHumanChoice();
+        const computerChoice = getComputerChoice();
+
+        const humanWin = playRound(humanChoice, computerChoice);
+
+        let winnerPhrase = "";
+        const capitalizedHumanChoice = humanChoice[0].toUpperCase() + humanChoice.slice(1);
+        const capitalizedComputerChoice = computerChoice[0].toUpperCase() + computerChoice.slice(1);
+
+        switch(humanWin) {
+            case -1:
+                winnerPhrase = `You lose! ${capitalizedComputerChoice} beats ${capitalizedHumanChoice}`;
+                computerScore++;
+                break;
+            case 0:
+                winnerPhrase = "It's a draw !";
+                break;
+            case 1:
+                winnerPhrase = `You win! ${capitalizedHumanChoice} beats ${capitalizedComputerChoice}`;
+                humanScore++;
+                break;
+        }
+        console.log(winnerPhrase);
+    }
+
+    console.log();
+
+    if (humanScore > computerScore) {
+        console.log("You win !");
+    } else if (humanScore < computerScore){
+        console.log("You lose !");
+    } else {
+        console.log("Draw !")
+    }
+    console.log("Scores: ");
+    console.log(`\t- Human: ${humanScore}`);
+    console.log(`\t- Computer: ${computerScore}`);
+}
+
+playGame();
