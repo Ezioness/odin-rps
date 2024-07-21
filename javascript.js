@@ -23,4 +23,21 @@ let getComputerChoice = () => {
     return move
 }
 
+
+let getHumanChoice = () => {
+    /*
+        get the user input with a prompt
+        checks whether the input is valid or not
+        returns that input or a default value
+    */
+   let humanChoice = prompt("Rock, paper or scissors ?").toLowerCase()
+
+   if(humanChoice != "rock" && humanChoice != "paper" && humanChoice != "scissors") {
+    humanChoice = "invalid"
+   }
+   
+   return humanChoice
+}
+
+console.log(getHumanChoice())
 console.log(getComputerChoice())
