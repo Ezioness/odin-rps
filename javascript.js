@@ -1,3 +1,8 @@
+let humanScore = 0;
+let computerScore = 0;
+
+const resultsDisplay = document.querySelector("#results");
+
 let getComputerChoice = () => {
     /*
         get a random number from 0 to 2
@@ -21,28 +26,15 @@ let getComputerChoice = () => {
     return move;
 }
 
-let getHumanChoice = () => {
+let playRound = (humanChoice) => {
     /*
-        get the user input with a prompt
-        checks whether the input is valid or not
-        returns that input or a default value
+        compare the two parameters according to the rps rules
+        if the human wins, return 1
+        if the computer wins, return -1
+        if it's a draw, return 0
     */
-   let humanChoice = prompt("Rock, paper or scissors ?").toLowerCase();
+    const computerChoice = getComputerChoice();
 
-   if(humanChoice != "rock" && humanChoice != "paper" && humanChoice != "scissors") {
-    humanChoice = "invalid";
-   }
-
-   return humanChoice;
-}
-
-let playRound = (humanChoice, computerChoice) => {
-        /*
-            compare the two parameters according to the rps rules
-            if the human wins, return 1
-            if the computer wins, return -1
-            if it's a draw, return 0
-        */
     let humanWin = 1;
     let draw = humanChoice == computerChoice;
 
@@ -71,54 +63,84 @@ let playRound = (humanChoice, computerChoice) => {
         humanWin = 0;
     }
     
-    return humanWin;
+    checkRoundWinner(humanWin, humanChoice, computerChoice);
 }
 
-let playGame = () => {
-    /*
-        loops 5 times to play 5 rounds
-    */
-    let humanScore = 0;
-    let computerScore = 0;
+let checkRoundWinner = (winner, humanChoice, computerChoice) => {
+    let winnerPhrase = "";
+    const capitalizedHumanChoice = humanChoice[0].toUpperCase() + humanChoice.slice(1);
+    const capitalizedComputerChoice = computerChoice[0].toUpperCase() + computerChoice.slice(1);
 
-    for(let i = 0; i < 5; i++) {
-        const humanChoice = getHumanChoice();
-        const computerChoice = getComputerChoice();
-
-        const humanWin = playRound(humanChoice, computerChoice);
-
-        let winnerPhrase = "";
-        const capitalizedHumanChoice = humanChoice[0].toUpperCase() + humanChoice.slice(1);
-        const capitalizedComputerChoice = computerChoice[0].toUpperCase() + computerChoice.slice(1);
-
-        switch(humanWin) {
-            case -1:
-                winnerPhrase = `You lose! ${capitalizedComputerChoice} beats ${capitalizedHumanChoice}`;
-                computerScore++;
-                break;
-            case 0:
-                winnerPhrase = "It's a draw !";
-                break;
-            case 1:
-                winnerPhrase = `You win! ${capitalizedHumanChoice} beats ${capitalizedComputerChoice}`;
-                humanScore++;
-                break;
-        }
-        console.log(winnerPhrase);
+    switch(winner) {
+        case -1:
+            winnerPhrase = `You lose! ${capitalizedComputerChoice} beats ${capitalizedHumanChoice}`;
+            computerScore++;
+            break;
+        case 0:
+            winnerPhrase = "It's a draw !";
+            break;
+        case 1:
+            winnerPhrase = `You win! ${capitalizedHumanChoice} beats ${capitalizedComputerChoice}`;
+            humanScore++;
+            break;
     }
+    console.log(winnerPhrase);
+    displayMessage(winnerPhrase);
+    displayScores();
 
-    console.log();
-
-    if (humanScore > computerScore) {
-        console.log("You win !");
-    } else if (humanScore < computerScore){
-        console.log("You lose !");
-    } else {
-        console.log("Draw !")
-    }
-    console.log("Scores: ");
-    console.log(`\t- Human: ${humanScore}`);
-    console.log(`\t- Computer: ${computerScore}`);
+    checkGameWinner();
 }
 
-playGame();
+let checkGameWinner = () => {
+    const winnerDisplay = document.createElement("p");
+    if(humanScore === 5) {
+        winnerDisplay.textContent = "You win !"
+        resultsDisplay.appendChild(winnerDisplay);
+        endGame();
+    } else if(computerScore === 5) {
+        winnerDisplay.textContent = "You Lose !"
+        resultsDisplay.appendChild(winnerDisplay);
+        endGame();
+    }
+
+}
+
+let endGame = () => {
+    const playerButtons = document.querySelectorAll("button");
+    playerButtons.forEach(button => {
+        button.disabled = true;
+    });
+
+    const newGameButton = document.createElement("button");
+    newGameButton.textContent = "New Game";
+
+    newGameButton.addEventListener("click", playNewGame);
+
+    resultsDisplay.appendChild(newGameButton);
+}
+
+let playNewGame = () => {
+    window.location.reload();
+}
+
+let displayMessage = (phrase) => {
+    resultsDisplay.textContent = phrase;
+}
+
+let displayScores = () => {
+    const humanDisplay = document.createElement("p");
+    const computerDisplay = document.createElement("p");
+
+    humanDisplay.textContent = `Human: ${humanScore}`;
+    computerDisplay.textContent = `Computer: ${computerScore}`;
+
+    resultsDisplay.appendChild(humanDisplay);
+    resultsDisplay.appendChild(computerDisplay);
+}
+
+const playerButtons = document.querySelectorAll("button");
+playerButtons.forEach(button => {
+    button.addEventListener("click", e => {
+        playRound(e.target.id);
+    });
+});
